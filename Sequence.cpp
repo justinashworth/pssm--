@@ -20,6 +20,7 @@ void Gene::readline( char linebuff[], int const chars )
 	for ( int i(0); i < chars; ++i ) {
 		char const thischar = linebuff[i];
 		if ( isnuc(thischar) ) clean[nclean++] = thischar;
+		else std::cerr << header_ << ": unrecognized letter (" << thischar << ") at position " << i << std::endl;
 	}
 	sequence_.insert( sequence_.end(), clean.begin(), clean.begin() + nclean );
 }
@@ -88,15 +89,25 @@ void GeneList::readfile( std::string const filename )
 	// read input file
 	// using a char array is faster than reading in/parsing strings
 	char linebuff[4096];
+	bool header_read(false);
 	while ( file.getline( linebuff, 4096 ) ) {
 //		std::cout << "DEBUG: " << linebuff << std::endl;
 
 		if ( linebuff[0] == '>' ) { // FASTA header
 //			std::cout << "DEBUG: fasta label: " << linebuff << std::endl;
-			genes_.push_back( Gene( linebuff ) ); continue;
+			header_read = true;
+			genes_.push_back( Gene( linebuff ) );
+			continue;
 		}
-//		std::cout << "DEBUG: fasta sequence linebuff " << linebuff << std::endl;
+		if ( header_read ) {
+			genes_.back().readline( linebuff, file.gcount() );
+//			std::cout << "DEBUG: fasta sequence linebuff " << linebuff << std::endl;
+		}
+	}
+	// get the final remaining contents of linebuff
+	if ( header_read ) {
 		genes_.back().readline( linebuff, file.gcount() );
+//		std::cout << "DEBUG: fasta sequence final linebuff " << linebuff << std::endl;
 	}
 	finalize();
 }

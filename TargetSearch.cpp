@@ -74,14 +74,17 @@ void TargetSearch::scan_seq( Gene const & gene )
 		gene.print();
 	}
 
+	std::vector< char > const & sequence( gene.sequence() );
+	unsigned start(0), length( pssm_.length() );
+	if ( sequence.size() < length ) {
+		std::cerr << "WARNING: sequence " << gene.name() << " shorter than PSSM" << std::endl;
+	}
+	unsigned end( sequence.size() - length );
+
 	unsigned const dotfreq( 100000 );
 	if ( outputlevel_ >= VERBOSE ) {
 		std::cerr << "(Each dot represents " << dotfreq << " basepairs searched.)" << std::endl;
 	}
-
-	std::vector< char > const & sequence( gene.sequence() );
-	unsigned start(0), length( pssm_.length() );
-	unsigned end( sequence.size() - length );
 
 	while ( start <= end ) {
 		float score(0.), worst( hits_.worst() );

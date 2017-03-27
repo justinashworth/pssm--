@@ -98,14 +98,15 @@ PSSM::score(
 	char letter
 ) const
 {
+//	std::cout << "DEBUG: letter=" << letter << std::endl;
 	for ( unsigned i(0); i < key_.size(); ++i ) {
 		if ( letter == key_[i] ) {
 			return positions_[ siteindex ].weights()[i];
 		}
 	}
-	std::cerr << "ERROR: score failed for " << letter << " at " << siteindex << std::endl;
-	exit(EXIT_FAILURE);
-	return 999999.;
+	std::cerr << "ERROR: score failed for unknown character (" << letter << ") at " << siteindex << std::endl;
+//	exit(EXIT_FAILURE);
+	return 0;
 }
 
 void
