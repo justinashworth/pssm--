@@ -89,10 +89,13 @@ void GeneList::readfile( std::string const filename )
 	// using a char array is faster than reading in/parsing strings
 	char linebuff[4096];
 	while ( file.getline( linebuff, 4096 ) ) {
+//		std::cout << "DEBUG: " << linebuff << std::endl;
 
 		if ( linebuff[0] == '>' ) { // FASTA header
+//			std::cout << "DEBUG: fasta label: " << linebuff << std::endl;
 			genes_.push_back( Gene( linebuff ) ); continue;
 		}
+//		std::cout << "DEBUG: fasta sequence linebuff " << linebuff << std::endl;
 		genes_.back().readline( linebuff, file.gcount() );
 	}
 	finalize();

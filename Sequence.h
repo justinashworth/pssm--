@@ -29,6 +29,9 @@ class Gene {
 		std::vector< char >::const_iterator begin() const { return sequence_.begin(); }
 		std::vector< char >::const_iterator end() const { return sequence_.end(); }
 
+		unsigned size() const { return sequence_.size(); }
+		std::string name() const { return header_; }
+
 		void finalize();
 
 		//// abbreviated summary of the gene sequence

@@ -32,6 +32,11 @@ TargetSearch::scan_seq( std::string const & filename )
 	numbps_ += genelist.numbps();
 	for ( std::vector< Gene >::const_iterator gene( genelist.begin() );
 	      gene != genelist.end(); ++gene ) {
+		// safety check: if sequence length is zero for some reason, warn and skip searching
+		if (gene->size() == 0) {
+			std::cerr << "WARNING: Skipping empty sequence " << gene->name() << std::endl;
+			continue;
+		}
 		scan_seq( *gene );
 	}
 }

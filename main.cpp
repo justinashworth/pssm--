@@ -158,7 +158,5 @@ int main( int argc, char *argv[] ) {
 		search.scan_seq( *name );
 	}
 	search.print_results();
-
-	return 0;
 }
 
