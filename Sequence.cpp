@@ -11,16 +11,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //// read and filter a line of input sequence from the file stream
-void Gene::readline( char linebuff[], int const chars )
+void Gene::readline( std::string const & line )
 {
+	unsigned const nchar(line.size());
 	// use temporary filter container to avoid constly multiple redimensioning
-	std::vector< char > clean( chars );
-	int nclean(0);
-	// filter as rapidly as possible
-	for ( int i(0); i < chars; ++i ) {
-		char const thischar = linebuff[i];
-		if ( isnuc(thischar) ) clean[nclean++] = thischar;
-		else std::cerr << header_ << ": unrecognized letter (" << thischar << ") at position " << i << std::endl;
+	std::vector< char > clean(nchar);
+	unsigned nclean(0);
+	// filter quickly/efficiently
+	for ( unsigned i(0); i < nchar; ++i ) {
+		if ( isnuc(line[i]) ) clean[nclean++] = line[i];
+		else std::cerr << name_ << ": unrecognized letter (" << line[i] << ") at position " << i << std::endl;
 	}
 	sequence_.insert( sequence_.end(), clean.begin(), clean.begin() + nclean );
 }
@@ -39,8 +39,8 @@ void
 Gene::print( std::ostream & out ) const
 {
 	unsigned maxhdr(15), maxseq(40);
-	if ( header_.size() < maxhdr ) out << header_;
-	else out << header_.substr(0,15);
+	if ( name_.size() < maxhdr ) out << name_;
+	else out << name_.substr(0,15);
 	out << ": ";
 	unsigned seqsize( sequence_.size() );
 	if ( seqsize <= maxseq ) out << sequence_;
@@ -88,27 +88,30 @@ void GeneList::readfile( std::string const filename )
 
 	// read input file
 	// using a char array is faster than reading in/parsing strings
-	char linebuff[4096];
-	bool header_read(false);
-	while ( file.getline( linebuff, 4096 ) ) {
-//		std::cout << "DEBUG: " << linebuff << std::endl;
+//	char linebuff[4096];
+	std::string line;
+	bool name_read(false);
+//	while ( file.getline( linebuff, 4096 ) ) {
+	while ( std::getline(file, line) ) {
+//		std::cout << "DEBUG: " << line << std::endl;
 
-		if ( linebuff[0] == '>' ) { // FASTA header
-//			std::cout << "DEBUG: fasta label: " << linebuff << std::endl;
-			header_read = true;
-			genes_.push_back( Gene( linebuff ) );
+		if ( line[0] == '>' ) { // FASTA header
+//			std::cout << "DEBUG: fasta label: " << line << std::endl;
+			name_read = true;
+			genes_.push_back( Gene(line) );
 			continue;
 		}
-		if ( header_read ) {
-			genes_.back().readline( linebuff, file.gcount() );
-//			std::cout << "DEBUG: fasta sequence linebuff " << linebuff << std::endl;
+		if ( name_read ) {
+			genes_.back().readline(line);
+//			std::cout << "DEBUG: fasta sequence line " << line << std::endl;
 		}
 	}
-	// get the final remaining contents of linebuff
-	if ( header_read ) {
-		genes_.back().readline( linebuff, file.gcount() );
-//		std::cout << "DEBUG: fasta sequence final linebuff " << linebuff << std::endl;
-	}
+
+//	// get the final remaining contents of line
+//	if ( name_read ) {
+//		genes_.back().readline(line);
+////		std::cout << "DEBUG: fasta sequence final line " << line << std::endl;
+//	}
 	finalize();
 }
 
