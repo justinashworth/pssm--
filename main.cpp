@@ -51,7 +51,8 @@ void usage_error()
 	std::cerr << "\n"
 	 << " -s|--seq|--sequence     sequencefile   : FASTA format\n"
 	 << " -l|--list               seqlistfile    : file with list of FASTA files\n"
-	 << " -p|--pssm               pssmfilename   : weight matrix\n"
+	 << " -p|--pssm               pssm           : weight matrix file or target string\n"
+	 << " -t|--target                            : pssm is a simple target string [ACGT] (not a pssm file)\n"
 	 << " -inv                                   : invert weights (for positive weights)\n"
 	 << " -n|--numhits|--hits     #              : number of hits (20)\n"
 	 << " -v|--verbose                           : more output\n"
@@ -66,9 +67,9 @@ int main( int argc, char *argv[] ) {
 
 	std::cout << std::endl;
 
-	std::string seqfilename, seqlistname, pssmfilename;
+	std::string seqfilename, seqlistname, pssm;
 	unsigned numhits(20);
-	bool invert_pssm(false);
+	bool invert_pssm(false), simple_target(false);
 	OutputLevel outputlevel(NORMAL);
 
 	// parse command line arguments
@@ -86,7 +87,10 @@ int main( int argc, char *argv[] ) {
 
 		} else if ( arg == "-p" || arg == "--pssm" ) {
 			if ( ++i >= argc ) usage_error();
-			pssmfilename = argv[i];
+			pssm = argv[i];
+
+		} else if ( arg == "-t" || arg == "--target" ) {
+			simple_target = true;
 
 		} else if ( arg == "-n" || arg == "--numhits" || arg == "--hits" ) {
 			if ( ++i >= argc ) usage_error();
@@ -147,11 +151,7 @@ int main( int argc, char *argv[] ) {
 		closedir(dp);
 	}
 
-	if ( pssmfilename.empty() ) {
-		std::cout << "ERROR: No pssm file given." << std::endl;
-		usage_error();
-	}
-	TargetSearch search( pssmfilename, numhits, invert_pssm, outputlevel );
+	TargetSearch search( pssm, numhits, simple_target, invert_pssm, outputlevel );
 	// perform the search, operates as a functor over gene files
 	for ( std::list< std::string >::const_iterator name( filenames.begin() );
 	      name != filenames.end(); ++name ) {

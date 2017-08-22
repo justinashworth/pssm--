@@ -79,6 +79,35 @@ PSSM::setup(
 }
 
 void
+PSSM::setup(std::string const & target)
+{
+	int siteindex(0);
+	std::list<char> const nucs( nucleotides() );
+
+	for(std::list<char>::const_iterator nt(nucs.begin()); nt!=nucs.end(); ++nt){
+		key_.push_back(*nt);
+	}
+
+	for(std::string::const_iterator it(target.begin()); it!=target.end(); ++it){
+		PssmPos new_pssm_pos(siteindex);
+		// all of the nucs specified by code letter
+		std::list<char> const deg( degen(*it) );
+		// check each of the key_ nucs for representation in deg
+		for(std::vector<char>::const_iterator k(key_.begin()); k!=key_.end(); ++k){
+			float weight(0);
+			for(std::list<char>::const_iterator b(deg.begin()); b!=deg.end(); ++b){
+				if (*k == *b) weight = -1;
+			}
+			new_pssm_pos.add_weight(weight);
+		}
+		positions_.push_back( new_pssm_pos );
+	}
+	length_ = positions_.size();
+
+	set_priority_and_best_cases();
+}
+
+void
 PSSM::print(
 	std::ostream & out
 ) const
@@ -117,6 +146,12 @@ PSSM::parse_key( std::string const & line )
 	linestream >> dummy; // "key"
 	char letter;
 	while ( linestream >> letter ) key_.push_back( upper( letter ) );
+	if(outputlevel_ > NORMAL){
+		std::cout << "key:" << std::endl;
+		for(std::vector<char>::const_iterator k(key_.begin()); k!=key_.end(); ++k){
+			std::cout << *k << std::endl;
+		}
+	}
 }
 
 void

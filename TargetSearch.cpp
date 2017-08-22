@@ -10,8 +10,9 @@
 #include "TargetSearch.h"
 
 TargetSearch::TargetSearch(
-	std::string const & pssmfilename,
+	std::string const & pssm,
 	unsigned maxhits,
+	bool simple_target,
 	bool invert_pssm,
 	OutputLevel outputlevel // = NORMAL
 )
@@ -19,7 +20,8 @@ TargetSearch::TargetSearch(
 		numbps_(0),
 		outputlevel_(outputlevel)
 {
-	pssm_.setup( pssmfilename.c_str(), invert_pssm, outputlevel );
+	if(simple_target) pssm_.setup(pssm);
+	else pssm_.setup( pssm.c_str(), invert_pssm, outputlevel );
 	hits_.maxhits( maxhits );
 	hits_.outputlevel( outputlevel );
 }
@@ -101,7 +103,7 @@ void TargetSearch::scan_seq( Gene const & gene )
 			if ( p == length-1 ) { // last position
 				if ( hits_.full() && score >= worst ) break;
 				std::vector<char> hitseq( gene.begin()+start, gene.begin()+start+length );
-				hits_.add_hit( score, hitseq, gene.header(), start );
+				hits_.add_hit( score, hitseq, gene.name(), start );
 			}
 		}
 
@@ -116,7 +118,7 @@ void TargetSearch::scan_seq( Gene const & gene )
 			if ( p == length-1 ) {
 				if ( hits_.full() && score >= worst ) break;
 				std::vector<char> hitseq( gene.begin()+start, gene.begin()+start+length );
-				hits_.add_hit( score, hitseq, gene.header(), start, true );
+				hits_.add_hit( score, hitseq, gene.name(), start, true );
 			}
 		}
 

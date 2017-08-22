@@ -7,6 +7,7 @@
 
 #include <iosfwd>
 #include <vector>
+#include <list>
 
 enum OutputLevel {
 	MINIMAL,
@@ -19,10 +20,13 @@ std::ostream & operator << (
 	std::vector< char > const & v
 );
 
-bool isnuc( char letter );
-char upper( char nucleotide );
-char lower( char nucleotide );
-char comp( char nucleotide );
+std::list<char> nucleotides();
+std::list<char> base_codes();
+std::list<char> degen(char);
+bool isnuc(char);
+char upper(char);
+char lower(char);
+char comp(char);
 
 bool secondfloatdesc(
 	std::pair< unsigned, float > const & p1,

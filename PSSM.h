@@ -45,6 +45,7 @@ class PSSM {
 		PSSM() : length_(0), outputlevel_(NORMAL) {}
 
 		void setup( std::string const & filename, bool invert, OutputLevel level = NORMAL );
+		void setup( std::string const & target);
 
 		unsigned length() const { return length_; }
 		int priority( unsigned siteindex ) const { return priority_[siteindex]; }
