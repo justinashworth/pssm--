@@ -133,7 +133,8 @@ PSSM::score(
 			return positions_[ siteindex ].weights()[i];
 		}
 	}
-	std::cerr << "ERROR: score failed for unknown character (" << letter << ") at " << siteindex << std::endl;
+	// this will be triggered by any non-true nucleotide, such as 'N'--no score assessed for these
+//	std::cerr << "ERROR: score failed for unknown character (" << letter << ") at " << siteindex << std::endl;
 //	exit(EXIT_FAILURE);
 	return 0;
 }
