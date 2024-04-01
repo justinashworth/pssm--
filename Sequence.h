@@ -19,15 +19,17 @@ class Gene {
 			: finalized_(false)
 		{}
 
-		Gene( char hdr[] ) { header_.assign( hdr ); finalized_ = false; }
+		Gene( std::string const & name ) { name_.assign( name ); finalized_ = false; }
 
 		std::vector< char > const & sequence() const { return sequence_; }
-		std::string const & header() const { return header_; }
-		void readline( char linebuff[], int const chars );
+		std::string const & name() const { return name_; }
+		void readline( std::string const & line);
 
 		// iterators to provide read access to the gene sequence
 		std::vector< char >::const_iterator begin() const { return sequence_.begin(); }
 		std::vector< char >::const_iterator end() const { return sequence_.end(); }
+
+		unsigned size() const { return sequence_.size(); }
 
 		void finalize();
 
@@ -37,7 +39,7 @@ class Gene {
 	private:
 		// try to make this data private...
 		std::vector< char > sequence_; // the meat
-		std::string header_;
+		std::string name_;
 		bool finalized_;
 };
 

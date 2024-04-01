@@ -3,13 +3,13 @@ CXX = g++
 # compiler warning flags
 WFLAGS = -Wall -W -Wextra -pedantic
 
-# debug build flags
-#DBFLAGS = -ggdb
-#CXXFLAGS = $(WFLAGS) $(DBFLAGS)
-
 # performance build flags
 OFLAGS = -O3
 CXXFLAGS = $(WFLAGS) $(OFLAGS)
+
+# debug build flags
+DBFLAGS = -ggdb -g
+#CXXFLAGS = $(WFLAGS) $(DBFLAGS)
 
 EXE = pssm++.linux
 OBJECTFILES = main.o TargetSearch.o Hits.o PSSM.o Sequence.o util.o

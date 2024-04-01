@@ -16,8 +16,9 @@ class TargetSearch {
 
 	public:
 		TargetSearch(
-			std::string const & pssmfilename,
+			std::string const & pssm,
 			unsigned maxhits,
+			bool simple_target,
 			bool invert_pssm,
 			OutputLevel outputlevel = NORMAL
 		);

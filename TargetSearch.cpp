@@ -10,8 +10,9 @@
 #include "TargetSearch.h"
 
 TargetSearch::TargetSearch(
-	std::string const & pssmfilename,
+	std::string const & pssm,
 	unsigned maxhits,
+	bool simple_target,
 	bool invert_pssm,
 	OutputLevel outputlevel // = NORMAL
 )
@@ -19,7 +20,8 @@ TargetSearch::TargetSearch(
 		numbps_(0),
 		outputlevel_(outputlevel)
 {
-	pssm_.setup( pssmfilename.c_str(), invert_pssm, outputlevel );
+	if(simple_target) pssm_.setup(pssm);
+	else pssm_.setup( pssm.c_str(), invert_pssm, outputlevel );
 	hits_.maxhits( maxhits );
 	hits_.outputlevel( outputlevel );
 }
@@ -32,6 +34,11 @@ TargetSearch::scan_seq( std::string const & filename )
 	numbps_ += genelist.numbps();
 	for ( std::vector< Gene >::const_iterator gene( genelist.begin() );
 	      gene != genelist.end(); ++gene ) {
+		// safety check: if sequence length is zero for some reason, warn and skip searching
+		if (gene->size() == 0) {
+			std::cerr << "WARNING: Skipping empty sequence " << gene->name() << std::endl;
+			continue;
+		}
 		scan_seq( *gene );
 	}
 }
@@ -69,14 +76,17 @@ void TargetSearch::scan_seq( Gene const & gene )
 		gene.print();
 	}
 
+	std::vector< char > const & sequence( gene.sequence() );
+	unsigned start(0), length( pssm_.length() );
+	if ( sequence.size() < length ) {
+		std::cerr << "WARNING: sequence " << gene.name() << " shorter than PSSM" << std::endl;
+	}
+	unsigned end( sequence.size() - length );
+
 	unsigned const dotfreq( 100000 );
 	if ( outputlevel_ >= VERBOSE ) {
 		std::cerr << "(Each dot represents " << dotfreq << " basepairs searched.)" << std::endl;
 	}
-
-	std::vector< char > const & sequence( gene.sequence() );
-	unsigned start(0), length( pssm_.length() );
-	unsigned end( sequence.size() - length );
 
 	while ( start <= end ) {
 		float score(0.), worst( hits_.worst() );
@@ -93,7 +103,7 @@ void TargetSearch::scan_seq( Gene const & gene )
 			if ( p == length-1 ) { // last position
 				if ( hits_.full() && score >= worst ) break;
 				std::vector<char> hitseq( gene.begin()+start, gene.begin()+start+length );
-				hits_.add_hit( score, hitseq, gene.header(), start );
+				hits_.add_hit( score, hitseq, gene.name(), start );
 			}
 		}
 
@@ -108,7 +118,7 @@ void TargetSearch::scan_seq( Gene const & gene )
 			if ( p == length-1 ) {
 				if ( hits_.full() && score >= worst ) break;
 				std::vector<char> hitseq( gene.begin()+start, gene.begin()+start+length );
-				hits_.add_hit( score, hitseq, gene.header(), start, true );
+				hits_.add_hit( score, hitseq, gene.name(), start, true );
 			}
 		}
 
